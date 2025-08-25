@@ -3,12 +3,20 @@ import dotenv from 'dotenv';
 import { initDB } from './config/db.js';
 import rateLimiter from './middleware/rateLimiter.js';
 import transactionsRoute from './routes/transactionsRoute.js';
+import job from "./config/cron.js";
 
 dotenv.config();
 
 const app = express();
 
+// Start the cron job
+if(process.env.MODE_ENV === "production") job.start()  
+
 const PORT = process.env.PORT || 5001;   
+
+app.get('/api/healthcheck', (req, res) => {
+  res.status(200).json({ status: 'API is running' });
+});
 
 // Middleware to parse JSON bodies
 app.use(rateLimiter); // Apply rate limiting middleware to all routes
