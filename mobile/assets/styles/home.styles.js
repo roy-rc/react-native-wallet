@@ -8,7 +8,8 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   content: {
-    padding: 20,
+    flex: 1,
+    padding: 15,
     paddingBottom: 0,
   },
   header: {
@@ -256,7 +257,7 @@ export const styles = StyleSheet.create({
   },
   transactionsList: {
     flex: 1,
-    marginHorizontal: 20,
+    marginHorizontal: 5,
   },
   transactionsListContent: {
     paddingBottom: 20,

@@ -1,12 +1,13 @@
 //react custom hook to fetch transactions
 import { useCallback, useState } from 'react';
 import { Alert } from 'react-native';
+import { API_URL } from '../constants/api.js';
 
 //esta url funciona para emulador android local
 //const API_URL = "http://localhost:5001/api";
 
 //esto sirve para ejecutar en emulador expo en el telefono fisico
-const API_URL = "https://react-native-wallet-backend-g81m.onrender.com/api";
+//const API_URL = "https://react-native-wallet-backend-g81m.onrender.com/api";
 
 
 export const useTransactions = (userId) => { 
