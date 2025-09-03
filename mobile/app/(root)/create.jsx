@@ -33,6 +33,10 @@ const CreateScreen = () => {
   };
 
   const handleCreate = async () => {
+    console.log("title", title);
+    console.log("amount", amount);
+    console.log("selectedCategory", selectedCategory.id);
+    console.log("user_id", user.id);
     if(!title) return Alert.alert("Please enter a title");
 
     if(!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <=0 ) {
@@ -53,9 +57,9 @@ const CreateScreen = () => {
             },
             body: JSON.stringify({
                 user_id: user.id,
-                title,
+                title: title,
                 amount: formattedAmount,
-                category_id: selectedCategory.id,
+                category: selectedCategory.id,
                 date: new Date(),
             }),
         }); 
@@ -70,7 +74,7 @@ const CreateScreen = () => {
       Alert.alert("Error", error.message || "Failed to create transaction");
       
     } finally {
-      setIsloading(false);
+      setIsLoading(false);
     }
 
     

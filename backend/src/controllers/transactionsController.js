@@ -8,7 +8,7 @@ export async function getTransactionByUserId(req, res){
         } 
 
         const transactions = await sql`
-        SELECT * FROM transaction WHERE user_id = ${user_id} ORDER BY created_at DESC;
+        SELECT t.id, t.title, t.created_at, t.amount c.icon,  FROM transaction t INNER JOIN category c ON t.category_id = c.id WHERE t.user_id = ${user_id} ORDER BY created_at DESC;
         `;
         res.status(200).json(transactions);
 
@@ -28,7 +28,7 @@ export async function createTransaction(req, res){
         } 
 
         const transaction = await sql`
-        INSERT INTO transaction (title, amount, category, user_id) 
+        INSERT INTO transaction (title, amount, category_id, user_id) 
         VALUES (${title}, ${amount}, ${category}, ${user_id})
         RETURNING *;
         `;

@@ -27,7 +27,7 @@ export const TransactionItem = ({ item, onDelete }) => {
         </View>
         <View style={styles.transactionLeft}>
           <Text style={styles.transactionTitle}>{item.title}</Text>
-          <Text style={styles.transactionCategory}>{item.category}</Text>
+          <Text style={styles.transactionCategory}>{item.icon}</Text>
         </View>
         <View style={styles.transactionRight}>
           <Text
