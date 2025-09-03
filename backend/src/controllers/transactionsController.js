@@ -68,6 +68,96 @@ export async function deleteTransaction(req, res){
     }    
 }
 
+export async function createCategory(req, res) {
+    try {
+        const { name, icon, user_id } = req.body;
+        
+        if (!name || !icon || !user_id) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        const category = await sql`
+        INSERT INTO category (name, icon, user_id)
+        VALUES (${name}, ${icon}, ${user_id})
+        RETURNING *;
+        `;
+        res.status(201).json(category[0]);
+
+    } catch (error) {
+        console.error('Error creating category:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+export async function getCategoriesByUserId(req, res) {
+    try {
+        const { user_id } = req.params;
+        if (!user_id) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+        const categories = await sql`
+        SELECT * FROM category 
+        WHERE user_id = ${user_id}
+        ORDER BY name ASC;
+        `;
+        res.status(200).json(categories);
+
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+export async function deleteCategory(req, res) {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            return res.status(400).json({ error: 'Category ID is required' });
+        }
+
+        const result = await sql`
+        DELETE FROM category WHERE id = ${id} RETURNING *;
+        `;
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Category not found' });
+        }
+        res.status(200).json({ message: 'Category deleted', category: result[0] });
+
+    } catch (error) {
+        console.error('Error deleting category:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+export async function updateCategory(req, res) {
+    try {
+        const { id } = req.params;
+        const { name, icon } = req.body;
+
+        if (!name || !icon) {
+            return res.status(400).json({ error: 'Name and icon are required' });
+        }
+
+        const result = await sql`
+        UPDATE category 
+        SET name = ${name}, icon = ${icon}
+        WHERE id = ${id}
+        RETURNING *;
+        `;
+        
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Category not found' });
+        }
+        
+        res.status(200).json(result[0]);
+
+    } catch (error) {
+        console.error('Error updating category:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 export async function getTransactionSummaryByUserId(req, res){
     try {
         const { user_id } = req.params;

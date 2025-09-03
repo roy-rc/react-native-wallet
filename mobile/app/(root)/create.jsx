@@ -1,30 +1,36 @@
 import { useUser } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, Alert, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native'
 import { API_URL } from '../../constants/api';
 import { styles } from '../../assets/styles/create.styles';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 
-const CATEGORY = [
-    { id: "food", name: "Food & Drinks" , icon: "fast-food" },
-    { id: "shopping", name: "Shopping" , icon: "cart" },
-    { id: "transportation", name: "Transportation" , icon: "car" },
-    { id: "entretainment", name: "Entretainment" , icon: "film" },
-    { id: "bilss", name: "Bills" , icon: "receipt" },
-    { id: "income", name: "Income" , icon: "cash" },
-    { id: "other", name: "Other" , icon: "ellipsis-horizontal" },
-];
-
-const createScreen = () => {
+const CreateScreen = () => {
   const router = useRouter(); 
   const {user} = useUser();
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [isExpense, setIsExpense] = useState(true);
-  const [isLoading, setIsloading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL}/transaction/category/${user.id}`);
+      if (!response.ok) throw new Error('Failed to fetch categories');
+      const data = await response.json();
+      setCategories(data);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to load categories');
+    }
+  };
 
   const handleCreate = async () => {
     if(!title) return Alert.alert("Please enter a title");
@@ -36,7 +42,7 @@ const createScreen = () => {
 
     if(!selectedCategory) return Alert.alert("Please select a category");
 
-    setIsloading(true);
+    setIsLoading(true);
     try {
         //format the amount (negative for expense and positive for income)
         const formattedAmount = isExpense ? -Math.abs(parseFloat(amount)) : Math.abs(parseFloat(amount));
@@ -49,7 +55,7 @@ const createScreen = () => {
                 user_id: user.id,
                 title,
                 amount: formattedAmount,
-                category: selectedCategory,
+                category_id: selectedCategory.id,
                 date: new Date(),
             }),
         }); 
@@ -154,23 +160,23 @@ const createScreen = () => {
           /> Category
         </Text>
         <View style={styles.categoryGrid}>
-          {CATEGORY.map((category) => (
+          {categories.map((category) => (
             <TouchableOpacity
               key={category.id}
               style={[
                 styles.categoryButton,
-                selectedCategory === category.name && styles.categoryButtonActive
+                selectedCategory?.id === category.id && styles.categoryButtonActive
               ]}
-              onPress={() => setSelectedCategory(category.name)}
+              onPress={() => setSelectedCategory(category)}
             >
               <Ionicons 
                 name={category.icon}
                 size={20}
-                color={ selectedCategory === category.name ? COLORS.white : COLORS.text }
+                color={selectedCategory?.id === category.id ? COLORS.white : COLORS.text}
               />
               <Text style={[
                 styles.categoryButtonText,
-                selectedCategory === category.name && styles.categoryButtonTextActive
+                selectedCategory?.id === category.id && styles.categoryButtonTextActive
               ]}>{" "}{category.name}</Text>
             </TouchableOpacity>
           ))}
@@ -185,4 +191,4 @@ const createScreen = () => {
   )
 }
 
-export default createScreen
+export default CreateScreen

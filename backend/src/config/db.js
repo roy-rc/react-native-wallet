@@ -8,12 +8,20 @@ export const sql = neon(process.env.DATABASE_URL);
 
 export async function initDB() {
   try {
+    await sql`CREATE TABLE IF NOT EXISTS category (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        icon VARCHAR(255) NOT NULL,
+        user_id VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`;
+
     await sql`CREATE TABLE IF NOT EXISTS transaction (
         id SERIAL PRIMARY KEY,  
         user_id VARCHAR(255) NOT NULL,
         title VARCHAR(255) NOT NULL,
         amount DECIMAL(10, 2) NOT NULL,
-        category VARCHAR(255) NOT NULL,
+        category_id INTEGER NOT NULL REFERENCES category(id),
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`;
 
